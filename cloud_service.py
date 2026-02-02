@@ -55,13 +55,15 @@ class CloudService:
             try:
                 with open(file_path, "rb") as file:
                     load_response = requests.put(upload_url, files={"file": file})
+                    return load_response
             except Exception as exp:
                 logger.error(f"Ошибка при чтении файла {file_name}: {exp}")
-            return load_response
+                return
         else:
             logger.error(
                 f'Ошибка запроса URL для загрузки файла {file_name}: {response.json().get("message")}'
             )
+            return response
 
     def reload(self, file_path: str) -> Any:
         """Метод перезаписи файла в облачное хранилище"""

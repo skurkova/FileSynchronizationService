@@ -46,23 +46,20 @@ def run_cloud_service(local_folder: str, client: CloudService) -> None:
     if only_local_files:
         for file_name in only_local_files:
             load = client.load(file_path=os.path.join(local_folder, file_name))
-            if load.status_code == 201:
+            if load and load.status_code == 201:
                 logger.info(f"Файл {file_name} успешно записан в облачное хранилище")
             else:
-                logger.error(
-                    f'Файл {file_name} не записан: {load.json().get("message", "error")}'
-                )
+                logger.error(f"Файл {file_name} не записан")
 
     # Удаляем файлы из облачного хранилища
-    if only_local_files:
+    if only_cloud_files:
         for file_name in only_cloud_files:
             delete = client.delete(filename=file_name)
-            if delete.status_code == 204:
+            if delete and delete.status_code == 204:
                 logger.info(f"Файл {file_name} успешно удален из облачного хранилища")
             else:
                 logger.error(
-                    f"Ошибка удаления файла {file_name} из облачного хранилища: "
-                    f'{delete.json().get("message", "error")}'
+                    f"Ошибка удаления файла {file_name} из облачного хранилища"
                 )
 
     # Сравниваем времена общих файлов
@@ -77,14 +74,12 @@ def run_cloud_service(local_folder: str, client: CloudService) -> None:
                 ).timestamp()
             ):
                 reload = client.reload(file_path=os.path.join(local_folder, file_name))
-                if reload.status_code == 201:
+                if reload and reload.status_code == 201:
                     logger.info(
                         f"Файл {file_name} успешно перезаписан в облачном хранилище"
                     )
                 else:
-                    logger.error(
-                        f'Файл {file_name} не перезаписан: {reload.json().get("message", "error")}'
-                    )
+                    logger.error(f"Файл {file_name} не перезаписан")
 
 
 def main():
@@ -92,7 +87,7 @@ def main():
     config.read("config.ini", encoding="UTF-8")
 
     LOCAL_FOLDER_PATH = config["DEFAULT"]["LOCAL_FOLDER_PATH"]
-    LOCAL_FOLDER = config["DEFAULT"]["LOCAL_FOLDER_PATH"]
+    LOCAL_FOLDER = os.path.basename(LOCAL_FOLDER_PATH)
     SYNC_INTERVAL = int(config["DEFAULT"]["SYNC_INTERVAL"])
     LOG_FILE = config["DEFAULT"]["LOG_FILE"]
     CLOUD_FOLDER = config["YandexDisk"]["CLOUD_FOLDER"]
@@ -104,61 +99,69 @@ def main():
         f"Программа синхронизации файлов начинает работу с директорией {LOCAL_FOLDER_PATH}"
     )
 
-    if not os.path.isdir(LOCAL_FOLDER_PATH):
-        logger.error(f"Локальная папка {LOCAL_FOLDER} не существует")
-        sys.exit(1)
-
     try:
         logger.info("Инициализация сервиса синхронизации файлов")
         client = CloudService(
             cloud_folder=CLOUD_FOLDER, token=YANDEX_TOKEN, base_url=BASE_URL
         )
+
         response = client.check_existence_cloud_folder()
-        if response.status_code == 200:
+        if response.status_code == 401:
+            logger.error(
+                "Ошибка авторизации. Неверный или недействительный токен доступа!}"
+            )
+            sys.exit(1)
+        elif response.status_code == 200:
             logger.info(f"Папка {CLOUD_FOLDER} в облачном хранилище существует")
         elif response.status_code == 201:
             logger.info(f"Папка {CLOUD_FOLDER} в облачном хранилище успешно создана")
-        else:
-            logger.error(
-                f"Ошибка создания папки {CLOUD_FOLDER} в облачном хранилище: "
-                f'{response.json().get("message")}'
-            )
-    except Exception as exp:
-        logger.error(
-            f"Ошибка подключения к сервису синхронизации файлов локальной папки {LOCAL_FOLDER}: {exp}"
-        )
-        sys.exit(1)
+        logger.info("Инициализация сервиса синхронизации файлов завершена успешно")
 
-    logger.info(f"Первая синхронизация файлов локальной папки {LOCAL_FOLDER}")
-    if not os.path.exists(LOCAL_FOLDER_PATH):
-        logger.error(
-            f"Локальная папка {LOCAL_FOLDER} для синхронизации в директории "
-            f"{LOCAL_FOLDER_PATH} отсутствует"
+        logger.info(
+            f"Первая синхронизация файлов локальной папки {LOCAL_FOLDER} запущена"
         )
-        sys.exit(1)
-
-    try:
-        run_cloud_service(LOCAL_FOLDER_PATH, client)
-    except Exception as exp:
-        logger.error(
-            f"Ошибка первой синхронизации файлов локальной папки {LOCAL_FOLDER}: {exp}"
-        )
-
-    logger.info(
-        f"Цикл периодической синхронизации файлов локальной папки {LOCAL_FOLDER} запущен"
-    )
-    while True:
         try:
-            time.sleep(SYNC_INTERVAL)
             run_cloud_service(LOCAL_FOLDER_PATH, client)
-        except KeyboardInterrupt:
-            logger.error(
-                f"Синхронизация файлов локальной папки {LOCAL_FOLDER} прервана пользователем"
+            logger.info(
+                f"Первая синхронизация файлов локальной папки {LOCAL_FOLDER} прошла успешно"
             )
+            logger.info(
+                f"Цикл периодической синхронизации файлов локальной папки {LOCAL_FOLDER} запущен"
+            )
+            while True:
+                try:
+                    time.sleep(SYNC_INTERVAL)
+                    run_cloud_service(LOCAL_FOLDER_PATH, client)
+                except FileNotFoundError as exp:
+                    logger.error(
+                        f"Локальная папка {LOCAL_FOLDER} отсутствует в директории {LOCAL_FOLDER_PATH}:"
+                        f"{exp}"
+                    )
+                    sys.exit(1)
+                except KeyboardInterrupt:
+                    logger.error(
+                        f"Синхронизация файлов локальной папки {LOCAL_FOLDER} прервана пользователем"
+                    )
+                except Exception as exp:
+                    logger.error(
+                        f"Ошибка синхронизации файлов локальной папки {LOCAL_FOLDER}: {exp}"
+                    )
+
+        except FileNotFoundError as exp:
+            logger.error(
+                f"Локальная папка {LOCAL_FOLDER} отсутствует в директории {LOCAL_FOLDER_PATH}:"
+                f"{exp}"
+            )
+            sys.exit(1)
         except Exception as exp:
             logger.error(
-                f"Ошибка синхронизации файлов локальной папки {LOCAL_FOLDER}: {exp}"
+                f"Ошибка первой синхронизации файлов локальной папки {LOCAL_FOLDER}: {exp}"
             )
+            sys.exit(1)
+
+    except Exception as exp:
+        logger.error(f"Ошибка инициализации сервиса синхронизации файлов: {exp}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
