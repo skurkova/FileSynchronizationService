@@ -1,0 +1,9 @@
+[DEFAULT]
+LOCAL_FOLDER_PATH =
+SYNC_INTERVAL = 30
+LOG_FILE = sync.log
+
+[YandexDisk]
+CLOUD_FOLDER = sync_backup
+BASE_URL = https://cloud-api.yandex.net/v1/disk/resources
+YANDEX_TOKEN =
