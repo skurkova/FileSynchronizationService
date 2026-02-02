@@ -4,7 +4,6 @@ import time
 import datetime
 import configparser
 
-from dotenv import load_dotenv
 from loguru import logger
 
 from cloud_service import CloudService
