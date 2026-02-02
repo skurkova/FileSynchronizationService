@@ -69,15 +69,6 @@ def run_cloud_service(local_folder: str, client: CloudService) -> None:
 
 
 def main():
-    # load_dotenv()
-    #
-    # LOCAL_FOLDER_PATH = os.getenv('LOCAL_FOLDER_PATH')
-    # LOCAL_FOLDER = os.path.basename('LOCAL_FOLDER_PATH')
-    # CLOUD_FOLDER = os.getenv('CLOUD_FOLDER')
-    # YANDEX_TOKEN = os.getenv('YANDEX_TOKEN')
-    # SYNC_INTERVAL = int(os.getenv('SYNC_INTERVAL'))
-    # LOG_FILE = os.getenv('LOG_FILE')
-
     config = configparser.ConfigParser()
     config.read('config.ini', encoding='UTF-8')
 
