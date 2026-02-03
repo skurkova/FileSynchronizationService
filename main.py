@@ -138,7 +138,7 @@ def main():
                 except FileNotFoundError as exp:
                     logger.error(
                         f"Локальная папка {LOCAL_FOLDER} для синхронизации файлов с облачным хранилищем удалена "
-                        f"во время работы: {exp}"
+                        f"во время работы: {str(exp)}"
                     )
                     sys.exit(1)
                 except KeyboardInterrupt:
@@ -150,7 +150,7 @@ def main():
                 except Exception as exp:
                     logger.error(
                         f"Неизвестная сетевая ошибка синхронизации файлов локальной папки {LOCAL_FOLDER} с облачным "
-                        f"хранилищем: {exp}"
+                        f"хранилищем: {str(exp)}"
                     )
 
         except FileNotFoundError as exp:
@@ -162,11 +162,11 @@ def main():
         except Exception as exp:
             logger.error(
                 f"Неизвестная сетевая ошибка первой синхронизации файлов локальной папки {LOCAL_FOLDER} с облачным "
-                f"хранилищем: {exp}"
+                f"хранилищем: {str(exp)}"
             )
 
     except Exception as exp:
-        logger.error(f"Неизвестная сетевая ошибка инициализации сервиса синхронизации файлов: {exp}")
+        logger.error(f"Неизвестная сетевая ошибка инициализации сервиса синхронизации файлов: {str(exp)}")
         sys.exit(1)
 
 

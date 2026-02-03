@@ -57,7 +57,7 @@ class CloudService:
                     load_response = requests.put(upload_url, files={"file": file})
                     return load_response
             except Exception as exp:
-                logger.error(f"Ошибка при чтении файла {file_name}: {exp}")
+                logger.error(f"Ошибка при чтении файла {file_name}: {str(exp)}")
                 return
         else:
             logger.error(
