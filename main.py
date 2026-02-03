@@ -118,49 +118,55 @@ def main():
         logger.info("Инициализация сервиса синхронизации файлов завершена успешно")
 
         logger.info(
-            f"Первая синхронизация файлов локальной папки {LOCAL_FOLDER} запущена"
+            f"Первая синхронизация файлов локальной папки {LOCAL_FOLDER} с облачным хранилищем запущена"
         )
         try:
             run_cloud_service(LOCAL_FOLDER_PATH, client)
             logger.info(
-                f"Первая синхронизация файлов локальной папки {LOCAL_FOLDER} прошла успешно"
+                f"Первая синхронизация файлов локальной папки {LOCAL_FOLDER} с облачным хранилищем прошла успешно"
             )
             logger.info(
-                f"Цикл периодической синхронизации файлов локальной папки {LOCAL_FOLDER} запущен"
+                f"Цикл периодической синхронизации файлов локальной папки {LOCAL_FOLDER} с облачным хранилищем запущен"
             )
             while True:
                 try:
                     time.sleep(SYNC_INTERVAL)
                     run_cloud_service(LOCAL_FOLDER_PATH, client)
+                    logger.info(
+                        f"Синхронизация файлов локальной папки {LOCAL_FOLDER} с облачным хранилищем прошла успешно"
+                    )
                 except FileNotFoundError as exp:
                     logger.error(
-                        f"Локальная папка {LOCAL_FOLDER} отсутствует в директории {LOCAL_FOLDER_PATH}:"
-                        f"{exp}"
+                        f"Локальная папка {LOCAL_FOLDER} для синхронизации файлов с облачным хранилищем удалена "
+                        f"во время работы: {exp}"
                     )
                     sys.exit(1)
                 except KeyboardInterrupt:
                     logger.error(
-                        f"Синхронизация файлов локальной папки {LOCAL_FOLDER} прервана пользователем"
+                        f"Синхронизация файлов локальной папки {LOCAL_FOLDER} с облачным хранилищем прервана "
+                        f"пользователем"
                     )
+                    sys.exit(1)
                 except Exception as exp:
                     logger.error(
-                        f"Ошибка синхронизации файлов локальной папки {LOCAL_FOLDER}: {exp}"
+                        f"Неизвестная сетевая ошибка синхронизации файлов локальной папки {LOCAL_FOLDER} с облачным "
+                        f"хранилищем: {exp}"
                     )
 
         except FileNotFoundError as exp:
             logger.error(
-                f"Локальная папка {LOCAL_FOLDER} отсутствует в директории {LOCAL_FOLDER_PATH}:"
+                f"Локальная папка {LOCAL_FOLDER} для синхронизации файлов отсутствует в директории {LOCAL_FOLDER_PATH}:"
                 f"{exp}"
             )
             sys.exit(1)
         except Exception as exp:
             logger.error(
-                f"Ошибка первой синхронизации файлов локальной папки {LOCAL_FOLDER}: {exp}"
+                f"Неизвестная сетевая ошибка первой синхронизации файлов локальной папки {LOCAL_FOLDER} с облачным "
+                f"хранилищем: {exp}"
             )
-            sys.exit(1)
 
     except Exception as exp:
-        logger.error(f"Ошибка инициализации сервиса синхронизации файлов: {exp}")
+        logger.error(f"Неизвестная сетевая ошибка инициализации сервиса синхронизации файлов: {exp}")
         sys.exit(1)
 
 

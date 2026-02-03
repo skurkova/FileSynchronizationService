@@ -1,6 +1,6 @@
 # File Synchronization Service
 
-**Сервис синхронизации файлов между локальной папкой и Яндекс.Диском.**
+**Сервис синхронизации файлов между локальной папкой и облачным хранилищем.**
 
 ## Требования
 - Python 3.11+
@@ -17,9 +17,9 @@ python3.11 -m venv venv
 source venv/bin/activate 
 
 # 3. Установите зависимости
-pip install requirements.txt
+pip install -r requirements.txt
 
-# 4. Настройте конфигурацию: укажите свои пути и токен
+# 4. Настройте конфигурацию, указав необходимые данные: 
 cp config.ini.example config.ini
 
 # 5. Запустите сервис
