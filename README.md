@@ -13,7 +13,7 @@ git clone https://github.com/skurkova/FileSynchronizationService.git
 cd FileSynchronizationService
 
 # 2. Создайте виртуальное окружение
-python3.11 -m venv venv
+python3 -m venv venv
 source venv/bin/activate 
 
 # 3. Установите зависимости
