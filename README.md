@@ -17,7 +17,7 @@ python3.11 -m venv venv
 source venv/bin/activate 
 
 # 3. Установите зависимости
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 
 # 4. Настройте конфигурацию, указав необходимые данные: 
 cp config.ini.example config.ini
