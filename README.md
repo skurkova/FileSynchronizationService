@@ -3,8 +3,8 @@
 **Сервис синхронизации файлов между локальной папкой и облачным хранилищем.**
 
 ## Требования
-- Python 3.11+
-- Библиотеки: `requests`, `loguru`, `configparser`
+- **Язык программирования**: Python 3.9+
+- **Библиотеки**: `requests`, `loguru`, `configparser`
 
 ## Установка
 ```bash
@@ -23,4 +23,4 @@ python3 -m pip install -r requirements.txt
 cp config.ini.example config.ini
 
 # 5. Запустите сервис
-python main.py
+python3 main.py
